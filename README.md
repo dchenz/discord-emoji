@@ -25,6 +25,25 @@ This library converts between unicode emojis and their Discord names. It also pr
 'https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f914.png'
 ```
 
+There is also support for emojis with tone markers!
+
+```python
+>>> discord_emoji.name_to_unicode("thumbsup_tone3")
+'👍🏽'
+>>> discord_emoji.name_to_unicode(":thumbsup_tone3:")
+'👍🏽'
+>>> discord_emoji.unicode_to_name("👍🏽")
+'thumbsup_tone3'
+>>> discord_emoji.unicode_to_name("👍🏽", put_colons=True)
+':thumbsup_tone3:'
+>>> discord_emoji.unicode_to_all_names("👍🏽")
+['thumbsup_tone3', '+1_tone3', 'thumbup_tone3']
+>>> discord_emoji.name_to_image("thumbsup_tone3")
+'https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f44d-1f3fd.png'
+>>> discord_emoji.unicode_to_image("👍🏽")
+'https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f44d-1f3fd.png'
+```
+
 ## Licence
 
 Please see [LICENSE](https://github.com/sevenc-nanashi/discord-emoji/blob/main/LICENSE).
