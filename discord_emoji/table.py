@@ -4001,3 +4001,20 @@ UNICODE_TO_DISCORD = {
     b"\xf0\x9f\xa7\x9f": ["zombie"],
     b"\xf0\x9f\x92\xa4": ["zzz"],
 }
+
+
+TONE_TO_UNICODE = {
+    "tone1": b"\xf0\x9f\x8f\xbb",
+    "tone2": b"\xf0\x9f\x8f\xbc",
+    "tone3": b"\xf0\x9f\x8f\xbd",
+    "tone4": b"\xf0\x9f\x8f\xbe",
+    "tone5": b"\xf0\x9f\x8f\xbf",
+}
+
+UNICODE_TO_TONE = {
+    b"\xf0\x9f\x8f\xbb": "tone1",
+    b"\xf0\x9f\x8f\xbc": "tone2",
+    b"\xf0\x9f\x8f\xbd": "tone3",
+    b"\xf0\x9f\x8f\xbe": "tone4",
+    b"\xf0\x9f\x8f\xbf": "tone5",
+}
