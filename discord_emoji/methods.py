@@ -1,11 +1,11 @@
-from typing import List, Optional, overload
+from typing import Optional
 
 from .table import DISCORD_TO_UNICODE, UNICODE_TO_DISCORD
 
 
-def to_unicode(name: str) -> Optional[str]:
-    """Get unicode emoji from discord name.
-    Returns None if couldn't find emoji.
+def name_to_unicode(name: str) -> Optional[str]:
+    """
+    Get unicode characters from discord emoji name.
 
     Parameters
     ----------
@@ -15,93 +15,112 @@ def to_unicode(name: str) -> Optional[str]:
 
     Returns
     -------
-    emoji : str
-        The found emoji.
+    Unicode for the found emoji.
+    Returns None, if not found.
     """
+
     real_name = name.strip(":")
-    res = DISCORD_TO_UNICODE.get(real_name)
-    return res
+    unicode_bytes = DISCORD_TO_UNICODE.get(real_name)
+    if not unicode_bytes:
+        return None
+    return unicode_bytes.decode("utf-8")
 
 
-@overload
-def to_discord(emoji: ..., get_all: True, put_colons: ...) -> List[str]:
-    pass
-
-
-@overload
-def to_discord(emoji: ..., get_all: False, put_colons: ...) -> Optional[str]:
-    pass
-
-
-def to_discord(emoji: str, get_all: bool = False, put_colons: bool = False):
-    """Get discord emoji name from unicode emoji.
-    Returns None or empty list if couldn't find emoji.
+def unicode_to_name(emoji: str, put_colons: bool = False) -> Optional[str]:
+    """
+    Get discord emoji name from unicode characters.
 
     Parameters
     ----------
     emoji : str
         Emoji to get name.
-    get_all : bool, optional
-        Whether get all emoji names, by default False
+    put_colons : bool, optional
+        Whether put colons to name.
+
+    Returns
+    -------
+    The found emoji's name on Discord.
+    Returns None, if not found.
+    """
+
+    unicode_bytes = emoji.encode("utf-8")
+    names = UNICODE_TO_DISCORD.get(unicode_bytes)
+    if not names:
+        return None
+    if put_colons:
+        return f":{names[0]}:"
+    return names[0]
+
+
+def unicode_to_all_names(emoji: str, put_colons: bool = False) -> Optional[list[str]]:
+    """
+    Get list of discord emoji names from unicode characters.
+
+    Parameters
+    ----------
+    emoji : str
+        Emoji to get names.
     put_colons : bool, optional
         Whether put colons to names.
 
     Returns
     -------
-    name : Union[str, List[str]]
-        Name of the found emoji.
-        If get_all is True, it will return list.
+    The found emoji's names on Discord.
+    Returns None, if not found.
     """
-    res = UNICODE_TO_DISCORD.get(emoji)
-    if res is None:
-        if get_all:
-            return []
-        else:
-            return None
-    else:
-        if put_colons:
-            res = [f":{name}:" for name in res]
-        if get_all:
-            return res
-        else:
-            return res[0]
+
+    unicode_bytes = emoji.encode("utf-8")
+    names = UNICODE_TO_DISCORD.get(unicode_bytes)
+    if not names:
+        return None
+    if put_colons:
+        names = [f":{n}:" for n in names]
+    return names
 
 
-def to_discord_multi(base: str) -> str:
-    """Replaces unicode emoji to discord name with colons.
+def unicode_to_image(emoji: str) -> Optional[str]:
+    """
+    Get URL to emoji image from unicode characters.
 
     Parameters
     ----------
-    base : str
-        String to convert.
+    emoji : str
+        Emoji to get image URL.
 
     Returns
     -------
-    str
-        Converted string.
+    URL to emoji image.
+    Returns None, if not found.
     """
-    res = base
-    for unicode_char, discord_name in UNICODE_TO_DISCORD.items():
-        res = res.replace(unicode_char, f":{discord_name[0]}:")
 
-    return res
+    if not unicode_to_name(emoji):
+        return None
+    hex_words = [hex(ord(x))[2:] for x in emoji]
+    if "200d" not in hex_words:
+        hex_words = [x for x in hex_words if x != "fe0f"]
+    return (
+        "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/%s.png"
+        % ("-".join(hex_words),)
+    )
 
 
-def to_unicode_multi(base: str) -> str:
-    """Replaces discord name with colons to unicode emoji.
+def name_to_image(name: str) -> Optional[str]:
+    """
+    Get URL to emoji image from discord emoji name.
 
     Parameters
     ----------
-    base : str
-        String to convert.
+    name : str
+        Name of the emoji to get.
+        `:` will be ignored.
 
     Returns
     -------
-    str
-        Converted string.
+    URL to emoji image.
+    Returns None, if not found.
     """
-    res = base
-    for discord_name, unicode_char in DISCORD_TO_UNICODE.items():
-        res = res.replace(f":{discord_name}:", unicode_char)
 
-    return res
+    emoji = name_to_unicode(name)
+    if not emoji:
+        return None
+    return unicode_to_image(emoji)
