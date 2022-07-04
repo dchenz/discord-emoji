@@ -74,6 +74,12 @@ def unicode_to_all_names(emoji: str, put_colons: bool = False) -> Optional[list[
     """
 
     unicode_bytes = emoji.encode("utf-8")
+
+    # Remove variation bytes on single emojis (without zero-width joiner)
+    if b"\xe2\x80\x8d" not in unicode_bytes:
+        unicode_bytes = unicode_bytes.replace(b"\xef\xb8\x8f", b"")
+        unicode_bytes = unicode_bytes.replace(b"\xef\xb8\x8f", b"")
+
     names = UNICODE_TO_DISCORD.get(unicode_bytes)
     if not names:
         names = _add_tone_marker_to_names(emoji)
@@ -102,8 +108,6 @@ def unicode_to_image(emoji: str) -> Optional[str]:
     if not unicode_to_name(emoji):
         return None
     hex_words = [hex(ord(x))[2:] for x in emoji]
-    if "200d" not in hex_words:
-        hex_words = [x for x in hex_words if x != "fe0f"]
     return (
         "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/%s.png"
         % ("-".join(hex_words),)
